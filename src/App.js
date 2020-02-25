@@ -30,21 +30,25 @@ export default class App extends React.Component {
     }
 
     async nextHeadline({ newsIndex, variantIndex }) {
-      const rawApiResponse = await fetch(`${'http://localhost:3000/'}${this.order[newsIndex].type}.json`)
-      const apiResponse = await rawApiResponse.json()
       const entry = this.order[newsIndex]
       const { stat, rotatingVariants, variant  } = entry
-      let line
-      let updatedVariantIndex = variantIndex
-      if (entry.rotatingVariants) {
-        line = apiResponse[`output_${stat}`][rotatingVariants[variantIndex]]
-        updatedVariantIndex = (variantIndex + 1) % 3
-      } else if (entry.variant) {
-        line = apiResponse[`output_${stat}`][variant]
-      } else {
-        line = apiResponse[`output_${stat}`]
-      }
       const updatedNewsIndex = (newsIndex + 1) % this.order.length
+      let updatedVariantIndex = variantIndex
+      let line
+      try {
+        const rawApiResponse = await fetch(`${'http://localhost:3000/'}${this.order[newsIndex].type}.json`)
+        const apiResponse = await rawApiResponse.json()
+        if (entry.rotatingVariants) {
+          line = apiResponse[`output_${stat}`][rotatingVariants[variantIndex]]
+          updatedVariantIndex = (variantIndex + 1) % 3
+        } else if (entry.variant) {
+          line = apiResponse[`output_${stat}`][variant]
+        } else {
+          line = apiResponse[`output_${stat}`]
+        }
+      } catch(e) {
+        console.log('** Error fetching from API endpoint', e)
+      }
       this.setState({
         categoryDisplay: entry.type,
         headlineDisplay: line,
@@ -66,10 +70,19 @@ export default class App extends React.Component {
       })
     }
 
+    translateCategory(rawCat) {
+      const dict = {
+        'internal-stats': '@cgbuen',
+        'nintendo': 'splatoon'
+      }
+      return dict[rawCat] || rawCat
+    }
+
     render() {
       return (
-        <div className="App">
-          [{this.state.categoryDisplay}] {this.state.headlineDisplay}
+        <div className="ticker">
+          <div className="category">{this.translateCategory(this.state.categoryDisplay)}</div>
+          <div className="headline">{this.state.headlineDisplay}</div>
         </div>
       )
     }
