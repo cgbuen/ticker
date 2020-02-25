@@ -2,20 +2,20 @@
   background: black;
   bottom: 0;
   color: white;
+  display: flex;
   font-family: Futura, 'Futura PT', sans-serif;
   font-weight: bold;
-  padding: 15px;
+  height: 48px;
+  line-height: 3;
+  padding: 0 15px;
   position: fixed;
-  white-space: nowrap;
   width: 100%;
 }
 .category {
   color: yellow;
-  display: inline-block;
   font-variant: small-caps;
   margin-right: 15px;
   width: 60px;
 }
 .headline {
-  display: inline-block;
 }
