@@ -39,9 +39,7 @@ export default class App extends React.Component {
       const lines = []
       let tempLine = line
       while (tempLine.length > 0) {
-        let matcher = (tempLine.match(/(\[.*?\] )(.*)/) || [])
-        let title = matcher[1]
-        let info = matcher[2]
+        const title = (tempLine.match(/(\[.*?\] )(.*)/) || [])[1]
         if (tempLine.length < THRESHOLD) {
           lines.push(tempLine)
           tempLine = ""
@@ -62,14 +60,13 @@ export default class App extends React.Component {
       const entry = this.order[newsIndex]
       const { stat, rotatingVariants, variant  } = entry
       const updatedNewsIndex = (newsIndex + 1) % this.order.length
-      let updatedVariantIndex = variantIndex
+      const updatedVariantIndex = updatedNewsIndex === 0 ? (variantIndex + 1) % COUNT_VARIANT : variantIndex
       let line
       try {
         const rawApiResponse = await fetch(`${'http://localhost:3000/'}${this.order[newsIndex].type}.json`)
         const apiResponse = await rawApiResponse.json()
         if (entry.rotatingVariants) {
           line = apiResponse[`output_${stat}`][rotatingVariants[variantIndex]]
-          updatedVariantIndex = (variantIndex + 1) % COUNT_VARIANT
         } else if (entry.variant) {
           line = apiResponse[`output_${stat}`][variant]
         } else {
