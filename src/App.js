@@ -29,6 +29,21 @@ export default class App extends React.Component {
       ]
     }
 
+    breakdown(line, THRESHOLD) {
+      const lines = []
+      while (line.length > 0) {
+        if (line.length < THRESHOLD) {
+          lines.push(line)
+          line = ""
+        } else {
+          let index = line.substr(0, THRESHOLD).lastIndexOf(' ')
+          lines.push(line.substr(0, index))
+          line = line.substr(index)
+        }
+      }
+      return lines
+    }
+
     async nextHeadline({ newsIndex, variantIndex }) {
       const entry = this.order[newsIndex]
       const { stat, rotatingVariants, variant  } = entry
@@ -49,18 +64,37 @@ export default class App extends React.Component {
       } catch(e) {
         console.log('** Error fetching from API endpoint', e)
       }
+      const lines = this.breakdown(line, 125)
       this.setState({
         categoryDisplay: entry.type,
-        headlineDisplay: line,
-        newsIndex: updatedNewsIndex,
-        variantIndex: updatedVariantIndex
+        headlineDisplay: lines.shift()
       })
-      setTimeout(() => {
-        this.nextHeadline({
-          newsIndex: updatedNewsIndex,
-          variantIndex: updatedVariantIndex,
-        })
-      }, 7000)
+      const loopLines = (linesArray) => {
+        if (linesArray.length) {
+          setTimeout(() => {
+            const displayLine = linesArray.shift()
+            this.setState({
+              categoryDisplay: entry.type,
+              headlineDisplay: displayLine,
+            })
+            if (displayLine) {
+              loopLines(linesArray)
+            }
+          }, 7000)
+        } else {
+          this.setState({
+            newsIndex: updatedNewsIndex,
+            variantIndex: updatedVariantIndex
+          })
+          setTimeout(() => {
+            this.nextHeadline({
+              newsIndex: updatedNewsIndex,
+              variantIndex: updatedVariantIndex,
+            })
+          }, 7000)
+        }
+      }
+      loopLines(lines)
     }
 
     async componentDidMount() {
