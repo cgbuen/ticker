@@ -37,7 +37,7 @@ export default class App extends React.Component {
 
     breakdown(line, THRESHOLD) {
       const lines = []
-      let tempLine = line
+      let tempLine = line || ''
       while (tempLine.length > 0) {
         const title = (tempLine.match(/(\[.*?\] )(.*)/) || [])[1]
         if (tempLine.length < THRESHOLD) {
