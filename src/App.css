@@ -1,21 +1,40 @@
+* {
+  box-sizing: border-box;
+}
 .ticker {
-  background: black;
+  background: url(/bg-main.png);
   bottom: 0;
   color: white;
   display: flex;
   font-family: Futura, 'Futura PT', sans-serif;
   font-weight: bold;
-  height: 48px;
+  font-size: 24px;
   line-height: 3;
-  padding: 0 15px;
+  overflow: hidden;
+  padding: 0 50px;
   position: fixed;
   width: 100%;
 }
 .category {
-  color: yellow;
+  color: white;
   font-variant: small-caps;
-  margin-right: 15px;
-  width: 60px;
+  margin: 0 25px 15px 0;
+  text-align: center;
+  text-shadow: 1px 2px 1px rgba(0, 0, 0, .75);
+  width: 130px;
 }
 .headline {
+}
+.category, .headline {
+  background-position: center;
+  transition: all .25s ease;
+  transform: translateY(0);
+}
+.slide {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+.fade {
+  opacity: 0;
+  transform: translateY(0);
 }
