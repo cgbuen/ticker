@@ -9,19 +9,22 @@
   font-family: Futura, 'Futura PT', sans-serif;
   font-weight: bold;
   font-size: 24px;
-  line-height: 3;
+  line-height: 72px;
   overflow: hidden;
   padding: 0 50px;
   position: fixed;
+  white-space: nowrap;
   width: 100%;
 }
 .category {
   color: white;
+  font-size: 28px;
   font-variant: small-caps;
-  margin: 0 25px 15px 0;
+  line-height: 72px;
+  margin: 0 25px;
   text-align: center;
   text-shadow: 1px 2px 1px rgba(0, 0, 0, .75);
-  width: 130px;
+  width: 150px;
 }
 .headline {
 }

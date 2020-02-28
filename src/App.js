@@ -75,7 +75,7 @@ export default class App extends React.Component {
       } catch(e) {
         console.log('** Error fetching from API endpoint', e)
       }
-      const lines = this.breakdown(line, 125)
+      const lines = this.breakdown(line, 120)
       const loopLines = async (linesArray) => {
         if (linesArray.length) {
           const displayLine = linesArray.shift()
