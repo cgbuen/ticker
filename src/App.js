@@ -4,6 +4,10 @@ import './App.css';
 const DURATION_ANIMATE = 250
 const DURATION_READ = 7000
 const COUNT_VARIANT = 3
+const SPOTIFY = true
+const SPLATOON_SOLOQ = true
+const SPLATOON_LEAGUE = false
+const SPLATOON_SALMON = false
 
 export default class App extends React.Component {
     constructor(props) {
@@ -16,23 +20,47 @@ export default class App extends React.Component {
         newsIndex: 0,
         variantIndex: 0
       }
-      this.order = [
-        { type: 'spotify', stat: 'currentlyPlaying' },
+      this.order = []
+      if (SPOTIFY) {
+        this.order.push({ type: 'spotify', stat: 'currentlyPlaying' })
+      }
+      this.order = this.order.concat([
         { type: 'twitch', stat: 'followers' },
         { type: 'twitch', stat: 'subs' },
         { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
         { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
         { type: 'internal-stats', stat: 'charity' },
         { type: 'internal-stats', stat: 'uptime' },
-        { type: 'nintendo', stat: 'ranks' },
-        { type: 'nintendo', stat: 'gear', variant: 'weapon' },
-        { type: 'nintendo', stat: 'gear', variant: 'head' },
-        { type: 'nintendo', stat: 'gear', variant: 'clothes' },
-        { type: 'nintendo', stat: 'gear', variant: 'shoes' },
-        { type: 'nintendo', stat: 'lifetimeWL' },
-        { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
-        { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
-      ]
+      ])
+      if (SPLATOON_SOLOQ) {
+        this.order = this.order.concat([
+          { type: 'nintendo', stat: 'ranks' },
+          { type: 'nintendo', stat: 'gear', variant: 'weapon' },
+          { type: 'nintendo', stat: 'gear', variant: 'head' },
+          { type: 'nintendo', stat: 'gear', variant: 'clothes' },
+          { type: 'nintendo', stat: 'gear', variant: 'shoes' },
+          { type: 'nintendo', stat: 'lifetimeWL' },
+          { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
+          { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
+        ])
+      }
+      if (SPLATOON_LEAGUE) {
+        this.order = this.order.concat([
+          { type: 'nintendo', stat: 'league', variant: 'pair' },
+          { type: 'nintendo', stat: 'league', variant: 'team' },
+          { type: 'nintendo', stat: 'gear', variant: 'weapon' },
+          { type: 'nintendo', stat: 'gear', variant: 'head' },
+          { type: 'nintendo', stat: 'gear', variant: 'clothes' },
+          { type: 'nintendo', stat: 'gear', variant: 'shoes' },
+          { type: 'nintendo', stat: 'lifetimeWL' },
+        ])
+      }
+      if (SPLATOON_SALMON) {
+        this.order = this.order.concat([
+          { type: 'nintendo', stat: 'salmonRun', variant: 'overall' },
+          { type: 'nintendo', stat: 'salmonRun', variant: 'individual' },
+        ])
+      }
     }
 
     breakdown(line, THRESHOLD) {
@@ -75,7 +103,7 @@ export default class App extends React.Component {
       } catch(e) {
         console.log('** Error fetching from API endpoint', e)
       }
-      const lines = this.breakdown(line, 120)
+      const lines = this.breakdown(line, 115)
       const loopLines = async (linesArray) => {
         if (linesArray.length) {
           const displayLine = linesArray.shift()
