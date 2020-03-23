@@ -4,8 +4,8 @@ import './App.css';
 const DURATION_ANIMATE = 250
 const DURATION_READ = 7000
 const COUNT_VARIANT = 3
-const SPOTIFY = true
-const SPLATOON_SOLOQ = true
+const SPOTIFY = false
+const SPLATOON_SOLOQ = false
 const SPLATOON_LEAGUE = false
 const SPLATOON_SALMON = false
 
@@ -34,31 +34,31 @@ export default class App extends React.Component {
       ])
       if (SPLATOON_SOLOQ) {
         this.order = this.order.concat([
-          { type: 'nintendo', stat: 'ranks' },
-          { type: 'nintendo', stat: 'gear', variant: 'weapon' },
-          { type: 'nintendo', stat: 'gear', variant: 'head' },
-          { type: 'nintendo', stat: 'gear', variant: 'clothes' },
-          { type: 'nintendo', stat: 'gear', variant: 'shoes' },
-          { type: 'nintendo', stat: 'lifetimeWL' },
-          { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
-          { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
+          { type: 'splatoon', stat: 'ranks' },
+          { type: 'splatoon', stat: 'gear', variant: 'weapon' },
+          { type: 'splatoon', stat: 'gear', variant: 'head' },
+          { type: 'splatoon', stat: 'gear', variant: 'clothes' },
+          { type: 'splatoon', stat: 'gear', variant: 'shoes' },
+          { type: 'splatoon', stat: 'lifetimeWL' },
+          { type: 'splatoon', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
+          { type: 'splatoon', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
         ])
       }
       if (SPLATOON_LEAGUE) {
         this.order = this.order.concat([
-          { type: 'nintendo', stat: 'league', variant: 'pair' },
-          { type: 'nintendo', stat: 'league', variant: 'team' },
-          { type: 'nintendo', stat: 'gear', variant: 'weapon' },
-          { type: 'nintendo', stat: 'gear', variant: 'head' },
-          { type: 'nintendo', stat: 'gear', variant: 'clothes' },
-          { type: 'nintendo', stat: 'gear', variant: 'shoes' },
-          { type: 'nintendo', stat: 'lifetimeWL' },
+          { type: 'splatoon', stat: 'league', variant: 'pair' },
+          { type: 'splatoon', stat: 'league', variant: 'team' },
+          { type: 'splatoon', stat: 'gear', variant: 'weapon' },
+          { type: 'splatoon', stat: 'gear', variant: 'head' },
+          { type: 'splatoon', stat: 'gear', variant: 'clothes' },
+          { type: 'splatoon', stat: 'gear', variant: 'shoes' },
+          { type: 'splatoon', stat: 'lifetimeWL' },
         ])
       }
       if (SPLATOON_SALMON) {
         this.order = this.order.concat([
-          { type: 'nintendo', stat: 'salmonRun', variant: 'overall' },
-          { type: 'nintendo', stat: 'salmonRun', variant: 'individual' },
+          { type: 'splatoon', stat: 'salmonRun', variant: 'overall' },
+          { type: 'splatoon', stat: 'salmonRun', variant: 'individual' },
         ])
       }
     }
@@ -155,8 +155,7 @@ export default class App extends React.Component {
 
     translateCategory(rawCat) {
       const dict = {
-        'internal-stats': '@cgbuen',
-        'nintendo': 'splatoon'
+        'internal-stats': '@cgbuen'
       }
       return dict[rawCat] || rawCat
     }
@@ -164,7 +163,7 @@ export default class App extends React.Component {
     getImage(rawCat) {
       const dict = {
         'internal-stats': '/gear-up-bg.png',
-        'nintendo': '/triangles--pink.png',
+        'splatoon': '/triangles--pink.png',
         'twitch': '/stars--blue.png',
         'spotify': '/stripes--green.png'
       }
