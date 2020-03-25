@@ -8,6 +8,7 @@ const SPOTIFY = false
 const SPLATOON_SOLOQ = false
 const SPLATOON_LEAGUE = false
 const SPLATOON_SALMON = false
+const ACNH = false
 
 export default class App extends React.Component {
     constructor(props) {
@@ -32,6 +33,13 @@ export default class App extends React.Component {
         { type: 'internal-stats', stat: 'charity' },
         { type: 'internal-stats', stat: 'uptime' },
       ])
+      if (ACNH) {
+        this.order = this.order.concat([
+          { type: 'acnh', stat: 'neighbors' },
+          { type: 'acnh', stat: 'player' },
+          { type: 'acnh', stat: 'island' }
+        ])
+      }
       if (SPLATOON_SOLOQ) {
         this.order = this.order.concat([
           { type: 'splatoon', stat: 'ranks' },
@@ -65,15 +73,42 @@ export default class App extends React.Component {
 
     breakdown(line, THRESHOLD) {
       const lines = []
-      let tempLine = line || ''
+      const imgRegExp = /scgbimage_(.*?)_(\d+)_ecgbimage/g
+      const matches = line.match(imgRegExp)
+      let tempLine = line.replace(imgRegExp, '_$2_') || ''
       while (tempLine.length > 0) {
         const title = (tempLine.match(/(\[.*?\] )(.*)/) || [])[1]
         if (tempLine.length < THRESHOLD) {
-          lines.push(tempLine)
+          if (matches) {
+            tempLine = tempLine.split(/_(\d+)_/g)
+            for (let i = 1; i < tempLine.length; i += 2) {
+              let data = matches[tempLine[i]].replace(imgRegExp, '$1').split('|srcClassSep|')
+              let src = data[0]
+              let imgClass = data[1]
+              tempLine[i] = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+            }
+          }
+          lines.push(<span>{tempLine}</span>)
           tempLine = ""
         } else {
           let index = tempLine.substr(0, THRESHOLD).lastIndexOf(' ')
-          lines.push(`${tempLine.substr(0, index)} ...`)
+          if (index < title.length + 7) {
+            index = THRESHOLD
+          }
+          let partialLine = tempLine.substr(0, index)
+          if (matches) {
+            partialLine = partialLine.split(/_(\d+)_/g)
+            for (let i = 1; i < partialLine.length; i += 2) {
+              let data = matches[partialLine[i]].replace(imgRegExp, '$1').split('|srcClassSep|')
+              let src = data[0]
+              let imgClass = data[1]
+              partialLine[i] = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+            }
+            partialLine.push(' ...')
+          } else {
+            partialLine += ' ...'
+          }
+          lines.push(<span>{partialLine}</span>)
           tempLine = `${title}...${tempLine.substr(index)}`
         }
       }
@@ -155,7 +190,8 @@ export default class App extends React.Component {
 
     translateCategory(rawCat) {
       const dict = {
-        'internal-stats': '@cgbuen'
+        'internal-stats': '@cgbuen',
+        'spotify': 'Music'
       }
       return dict[rawCat] || rawCat
     }
@@ -164,6 +200,7 @@ export default class App extends React.Component {
       const dict = {
         'internal-stats': '/gear-up-bg.png',
         'splatoon': '/triangles--pink.png',
+        'acnh': '/pattern-leaves-turquoise-2x.jpg',
         'twitch': '/stars--blue.png',
         'spotify': '/stripes--green.png'
       }
