@@ -4,7 +4,8 @@ import './App.css';
 const DURATION_ANIMATE = 250
 const DURATION_READ = 7000
 const COUNT_VARIANT = 3
-const SPOTIFY = false
+const SPOTIFY = true
+const DEFAULTS = true
 const SPLATOON_SOLOQ = false
 const SPLATOON_LEAGUE = false
 const SPLATOON_SALMON = false
@@ -18,21 +19,21 @@ export default class App extends React.Component {
         categoryAnimate: '',
         headlineDisplay: '',
         headlineAnimate: '',
-        newsIndex: 0,
-        variantIndex: 0
       }
       this.order = []
       if (SPOTIFY) {
         this.order.push({ type: 'spotify', stat: 'currentlyPlaying' })
       }
-      this.order = this.order.concat([
-        { type: 'twitch', stat: 'followers' },
-        { type: 'twitch', stat: 'subs' },
-        { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
-        { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
-        { type: 'internal-stats', stat: 'charity' },
-        { type: 'internal-stats', stat: 'uptime' },
-      ])
+      if (DEFAULTS) {
+        this.order = this.order.concat([
+          { type: 'twitch', stat: 'followers' },
+          { type: 'twitch', stat: 'subs' },
+          { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
+          { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
+          { type: 'internal-stats', stat: 'charity' },
+          { type: 'internal-stats', stat: 'uptime' },
+        ])
+      }
       if (ACNH) {
         this.order = this.order.concat([
           { type: 'acnh', stat: 'neighbors' },
@@ -74,8 +75,8 @@ export default class App extends React.Component {
     breakdown(line, THRESHOLD) {
       const lines = []
       const imgRegExp = /scgbimage_(.*?)_(\d+)_ecgbimage/g
-      const matches = line.match(imgRegExp)
-      let tempLine = line.replace(imgRegExp, '_$2_') || ''
+      const matches = (line || '').match(imgRegExp)
+      let tempLine = (line || '').replace(imgRegExp, '_$2_') || ''
       while (tempLine.length > 0) {
         const title = (tempLine.match(/(\[.*?\] )(.*)/) || [])[1]
         if (tempLine.length < THRESHOLD) {
@@ -128,6 +129,13 @@ export default class App extends React.Component {
       try {
         const rawApiResponse = await fetch(`${'http://localhost:3000/'}${this.order[newsIndex].type}.json`)
         const apiResponse = await rawApiResponse.json()
+        if (Object.keys(apiResponse).length === 0 && apiResponse.constructor === Object) {
+          console.log('** Empty object response presumably from error fetching API endpoint')
+          return this.nextHeadline({
+            newsIndex: updatedNewsIndex,
+            variantIndex: updatedVariantIndex,
+          })
+        }
         if (entry.rotatingVariants) {
           line = apiResponse[`output_${stat}`][rotatingVariants[variantIndex]]
         } else if (entry.variant) {
@@ -156,10 +164,6 @@ export default class App extends React.Component {
             loopLines(linesArray)
           }
         } else {
-          this.setState({
-            newsIndex: updatedNewsIndex,
-            variantIndex: updatedVariantIndex
-          })
           await this.sleep(DURATION_READ)
           this.nextHeadline({
             newsIndex: updatedNewsIndex,
@@ -183,15 +187,16 @@ export default class App extends React.Component {
 
     async componentDidMount() {
       await this.nextHeadline({
-        newsIndex: this.state.newsIndex,
-        variantIndex: this.state.variantIndex
+        newsIndex: 0,
+        variantIndex: 0
       })
     }
 
     translateCategory(rawCat) {
       const dict = {
         'internal-stats': '@cgbuen',
-        'spotify': 'Music'
+        'spotify': 'music',
+        'twitch': '@cgbuen',
       }
       return dict[rawCat] || rawCat
     }
@@ -201,7 +206,7 @@ export default class App extends React.Component {
         'internal-stats': '/gear-up-bg.png',
         'splatoon': '/triangles--pink.png',
         'acnh': '/pattern-leaves-turquoise-2x.jpg',
-        'twitch': '/stars--blue.png',
+        'twitch': '/gear-up-bg.png',
         'spotify': '/stripes--green.png'
       }
       return dict[rawCat]
