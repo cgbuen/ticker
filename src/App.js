@@ -31,7 +31,7 @@ export default class App extends React.Component {
           { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
           { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
           { type: 'internal-stats', stat: 'charity' },
-          { type: 'internal-stats', stat: 'uptime' },
+          { type: 'twitch', stat: 'uptime' },
         ])
       }
       if (ACNH) {
