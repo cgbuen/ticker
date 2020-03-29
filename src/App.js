@@ -5,9 +5,11 @@ const DURATION_ANIMATE = 250
 const DURATION_READ = 7000
 const COUNT_VARIANT = 3
 const SPOTIFY = true
-const SPLATOON_SOLOQ = true
+const DEFAULTS = true
+const SPLATOON_SOLOQ = false
 const SPLATOON_LEAGUE = false
 const SPLATOON_SALMON = false
+const ACNH = false
 
 export default class App extends React.Component {
     constructor(props) {
@@ -17,63 +19,97 @@ export default class App extends React.Component {
         categoryAnimate: '',
         headlineDisplay: '',
         headlineAnimate: '',
-        newsIndex: 0,
-        variantIndex: 0
       }
       this.order = []
       if (SPOTIFY) {
         this.order.push({ type: 'spotify', stat: 'currentlyPlaying' })
       }
-      this.order = this.order.concat([
-        { type: 'twitch', stat: 'followers' },
-        { type: 'twitch', stat: 'subs' },
-        { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
-        { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
-        { type: 'internal-stats', stat: 'charity' },
-        { type: 'internal-stats', stat: 'uptime' },
-      ])
+      if (DEFAULTS) {
+        this.order = this.order.concat([
+          { type: 'twitch', stat: 'followers' },
+          { type: 'twitch', stat: 'subs' },
+          { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
+          { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
+          { type: 'internal-stats', stat: 'charity' },
+          { type: 'twitch', stat: 'uptime' },
+        ])
+      }
+      if (ACNH) {
+        this.order = this.order.concat([
+          { type: 'acnh', stat: 'neighbors' },
+          { type: 'acnh', stat: 'player' },
+          { type: 'acnh', stat: 'island' }
+        ])
+      }
       if (SPLATOON_SOLOQ) {
         this.order = this.order.concat([
-          { type: 'nintendo', stat: 'ranks' },
-          { type: 'nintendo', stat: 'gear', variant: 'weapon' },
-          { type: 'nintendo', stat: 'gear', variant: 'head' },
-          { type: 'nintendo', stat: 'gear', variant: 'clothes' },
-          { type: 'nintendo', stat: 'gear', variant: 'shoes' },
-          { type: 'nintendo', stat: 'lifetimeWL' },
-          { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
-          { type: 'nintendo', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
+          { type: 'splatoon', stat: 'ranks' },
+          { type: 'splatoon', stat: 'gear', variant: 'weapon' },
+          { type: 'splatoon', stat: 'gear', variant: 'head' },
+          { type: 'splatoon', stat: 'gear', variant: 'clothes' },
+          { type: 'splatoon', stat: 'gear', variant: 'shoes' },
+          { type: 'splatoon', stat: 'lifetimeWL' },
+          { type: 'splatoon', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
+          { type: 'splatoon', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
         ])
       }
       if (SPLATOON_LEAGUE) {
         this.order = this.order.concat([
-          { type: 'nintendo', stat: 'league', variant: 'pair' },
-          { type: 'nintendo', stat: 'league', variant: 'team' },
-          { type: 'nintendo', stat: 'gear', variant: 'weapon' },
-          { type: 'nintendo', stat: 'gear', variant: 'head' },
-          { type: 'nintendo', stat: 'gear', variant: 'clothes' },
-          { type: 'nintendo', stat: 'gear', variant: 'shoes' },
-          { type: 'nintendo', stat: 'lifetimeWL' },
+          { type: 'splatoon', stat: 'league', variant: 'pair' },
+          { type: 'splatoon', stat: 'league', variant: 'team' },
+          { type: 'splatoon', stat: 'gear', variant: 'weapon' },
+          { type: 'splatoon', stat: 'gear', variant: 'head' },
+          { type: 'splatoon', stat: 'gear', variant: 'clothes' },
+          { type: 'splatoon', stat: 'gear', variant: 'shoes' },
+          { type: 'splatoon', stat: 'lifetimeWL' },
         ])
       }
       if (SPLATOON_SALMON) {
         this.order = this.order.concat([
-          { type: 'nintendo', stat: 'salmonRun', variant: 'overall' },
-          { type: 'nintendo', stat: 'salmonRun', variant: 'individual' },
+          { type: 'splatoon', stat: 'salmonRun', variant: 'overall' },
+          { type: 'splatoon', stat: 'salmonRun', variant: 'individual' },
         ])
       }
     }
 
     breakdown(line, THRESHOLD) {
       const lines = []
-      let tempLine = line || ''
+      const imgRegExp = /scgbimage_(.*?)_(\d+)_ecgbimage/g
+      const matches = (line || '').match(imgRegExp)
+      let tempLine = (line || '').replace(imgRegExp, '_$2_') || ''
       while (tempLine.length > 0) {
         const title = (tempLine.match(/(\[.*?\] )(.*)/) || [])[1]
         if (tempLine.length < THRESHOLD) {
-          lines.push(tempLine)
+          if (matches) {
+            tempLine = tempLine.split(/_(\d+)_/g)
+            for (let i = 1; i < tempLine.length; i += 2) {
+              let data = matches[tempLine[i]].replace(imgRegExp, '$1').split('|srcClassSep|')
+              let src = data[0]
+              let imgClass = data[1]
+              tempLine[i] = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+            }
+          }
+          lines.push(<span>{tempLine}</span>)
           tempLine = ""
         } else {
           let index = tempLine.substr(0, THRESHOLD).lastIndexOf(' ')
-          lines.push(`${tempLine.substr(0, index)} ...`)
+          if (index < title.length + 7) {
+            index = THRESHOLD
+          }
+          let partialLine = tempLine.substr(0, index)
+          if (matches) {
+            partialLine = partialLine.split(/_(\d+)_/g)
+            for (let i = 1; i < partialLine.length; i += 2) {
+              let data = matches[partialLine[i]].replace(imgRegExp, '$1').split('|srcClassSep|')
+              let src = data[0]
+              let imgClass = data[1]
+              partialLine[i] = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+            }
+            partialLine.push(' ...')
+          } else {
+            partialLine += ' ...'
+          }
+          lines.push(<span>{partialLine}</span>)
           tempLine = `${title}...${tempLine.substr(index)}`
         }
       }
@@ -93,6 +129,13 @@ export default class App extends React.Component {
       try {
         const rawApiResponse = await fetch(`${'http://localhost:3000/'}${this.order[newsIndex].type}.json`)
         const apiResponse = await rawApiResponse.json()
+        if (Object.keys(apiResponse).length === 0 && apiResponse.constructor === Object) {
+          console.log('** Empty object response presumably from error fetching API endpoint')
+          return this.nextHeadline({
+            newsIndex: updatedNewsIndex,
+            variantIndex: updatedVariantIndex,
+          })
+        }
         if (entry.rotatingVariants) {
           line = apiResponse[`output_${stat}`][rotatingVariants[variantIndex]]
         } else if (entry.variant) {
@@ -121,10 +164,6 @@ export default class App extends React.Component {
             loopLines(linesArray)
           }
         } else {
-          this.setState({
-            newsIndex: updatedNewsIndex,
-            variantIndex: updatedVariantIndex
-          })
           await this.sleep(DURATION_READ)
           this.nextHeadline({
             newsIndex: updatedNewsIndex,
@@ -148,15 +187,16 @@ export default class App extends React.Component {
 
     async componentDidMount() {
       await this.nextHeadline({
-        newsIndex: this.state.newsIndex,
-        variantIndex: this.state.variantIndex
+        newsIndex: 0,
+        variantIndex: 0
       })
     }
 
     translateCategory(rawCat) {
       const dict = {
         'internal-stats': '@cgbuen',
-        'nintendo': 'splatoon'
+        'spotify': 'music',
+        'twitch': '@cgbuen',
       }
       return dict[rawCat] || rawCat
     }
@@ -164,8 +204,9 @@ export default class App extends React.Component {
     getImage(rawCat) {
       const dict = {
         'internal-stats': '/gear-up-bg.png',
-        'nintendo': '/triangles--pink.png',
-        'twitch': '/stars--blue.png',
+        'splatoon': '/triangles--pink.png',
+        'acnh': '/pattern-leaves-turquoise-2x.jpg',
+        'twitch': '/gear-up-bg.png',
         'spotify': '/stripes--green.png'
       }
       return dict[rawCat]

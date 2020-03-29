@@ -11,7 +11,7 @@
   font-size: 24px;
   line-height: 72px;
   overflow: hidden;
-  padding: 0 50px;
+  padding: 0 40px;
   position: fixed;
   white-space: nowrap;
   width: 100%;
@@ -40,4 +40,21 @@
 .fade {
   opacity: 0;
   transform: translateY(0);
+}
+.splatoonweapon, .acnhneighbor, .splatoonskill {
+  background-size: contain;
+  display: inline-block;
+  height: 55px;
+  margin-right: 5px;
+  opacity: 1;
+  transition: opacity 2s ease-in;
+  transform: translateY(0);
+  vertical-align: middle;
+  width: 55px;
+}
+.acnhneighbor, .splatoonskill {
+  background-color: black;
+  border: 3px solid white;
+  border-radius: 50%;
+  padding: 3px;
 }
