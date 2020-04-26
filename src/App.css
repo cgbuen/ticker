@@ -2,13 +2,14 @@
   box-sizing: border-box;
 }
 .ticker {
+  -webkit-font-smoothing: antialiased;
   background: url(/bg-main.png);
   bottom: 0;
   color: white;
   display: flex;
-  font-family: Futura, 'Futura PT', sans-serif;
-  font-weight: bold;
-  font-size: 24px;
+  font-family: futura-pt-bold, sans-serif;
+  font-weight: 700;
+  font-size: 28px;
   line-height: 72px;
   overflow: hidden;
   padding: 0 40px;
@@ -18,12 +19,13 @@
 }
 .category {
   color: white;
-  font-size: 28px;
-  font-variant: small-caps;
+  font-size: 23px;
+  letter-spacing: 1px;
   line-height: 72px;
   margin: 0 25px;
   text-align: center;
   text-shadow: 1px 2px 1px rgba(0, 0, 0, .75);
+  text-transform: uppercase;
   width: 150px;
 }
 .headline {
