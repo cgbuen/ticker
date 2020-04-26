@@ -19,6 +19,8 @@ export default class App extends React.Component {
         categoryAnimate: '',
         headlineDisplay: '',
         headlineAnimate: '',
+        cache: {},
+        cacheImages: [],
       }
       this.order = []
       if (SPOTIFY) {
@@ -86,7 +88,20 @@ export default class App extends React.Component {
               let data = matches[tempLine[i]].replace(imgRegExp, '$1').split('|srcClassSep|')
               let src = data[0]
               let imgClass = data[1]
-              tempLine[i] = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+              let img = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+              tempLine[i] = img
+              if (!this.state.cache[src]) {
+                this.setState({
+                  cache: {
+                    ...this.state.cache,
+                    [src]: true
+                  },
+                  cacheImages: [
+                    ...this.state.cacheImages,
+                    React.cloneElement(img, { key: src })
+                  ]
+                })
+              }
             }
           }
           lines.push(<span>{tempLine}</span>)
@@ -103,7 +118,20 @@ export default class App extends React.Component {
               let data = matches[partialLine[i]].replace(imgRegExp, '$1').split('|srcClassSep|')
               let src = data[0]
               let imgClass = data[1]
-              partialLine[i] = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+              let img = <div className={`${imgClass} ${this.state.headlineAnimate}`} key={i} style={{backgroundImage: `url(${'http://opt.moovweb.net/img?img='}${encodeURIComponent(src)})`}} />
+              partialLine[i] = img
+              if (!this.state.cache[src]) {
+                this.setState({
+                  cache: {
+                    ...this.state.cache,
+                    [src]: true
+                  },
+                  cacheImages: [
+                    ...this.state.cacheImages,
+                    React.cloneElement(img, { key: src })
+                  ]
+                })
+              }
             }
             partialLine.push(' ...')
           } else {
@@ -217,7 +245,8 @@ export default class App extends React.Component {
         categoryDisplay,
         categoryAnimate,
         headlineDisplay,
-        headlineAnimate
+        headlineAnimate,
+        cacheImages
       } = this.state
       return (
         <div className="ticker">
@@ -226,6 +255,9 @@ export default class App extends React.Component {
           </div>
           <div className={`headline ${headlineAnimate}`}>
             {headlineDisplay}
+          </div>
+          <div className="cache">
+            {cacheImages}
           </div>
         </div>
       )
