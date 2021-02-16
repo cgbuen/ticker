@@ -1,15 +1,10 @@
 import React from 'react'
 import './App.css'
+import { CATEGORIES } from './categories'
 
 const DURATION_ANIMATE = 250
 const DURATION_READ = 7000
 const COUNT_VARIANT = 3
-const SPOTIFY = true
-const DEFAULTS = true
-const SPLATOON_SOLOQ = false
-const SPLATOON_LEAGUE = false
-const SPLATOON_SALMON = false
-const ACNH = false
 
 export default class App extends React.Component {
     constructor(props) {
@@ -22,56 +17,8 @@ export default class App extends React.Component {
         cache: {},
         cacheImages: [],
       }
+      this.settings = []
       this.order = []
-      if (SPOTIFY) {
-        this.order.push({ type: 'spotify', stat: 'currentlyPlaying' })
-      }
-      if (DEFAULTS) {
-        this.order = this.order.concat([
-          { type: 'twitch', stat: 'followers' },
-          { type: 'twitch', stat: 'subs' },
-          { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
-          { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
-          { type: 'internal-stats', stat: 'charity' },
-          { type: 'twitch', stat: 'uptime' },
-        ])
-      }
-      if (ACNH) {
-        this.order = this.order.concat([
-          { type: 'acnh', stat: 'neighbors' },
-          { type: 'acnh', stat: 'player' },
-          { type: 'acnh', stat: 'island' }
-        ])
-      }
-      if (SPLATOON_SOLOQ) {
-        this.order = this.order.concat([
-          { type: 'splatoon', stat: 'ranks' },
-          { type: 'splatoon', stat: 'gear', variant: 'weapon' },
-          { type: 'splatoon', stat: 'gear', variant: 'head' },
-          { type: 'splatoon', stat: 'gear', variant: 'clothes' },
-          { type: 'splatoon', stat: 'gear', variant: 'shoes' },
-          { type: 'splatoon', stat: 'lifetimeWL' },
-          { type: 'splatoon', stat: 'weaponStats', rotatingVariants: ['wins', 'ratio', 'turf'] },
-          { type: 'splatoon', stat: 'weaponStats', rotatingVariants: ['losses', 'games', 'recent'] }
-        ])
-      }
-      if (SPLATOON_LEAGUE) {
-        this.order = this.order.concat([
-          { type: 'splatoon', stat: 'league', variant: 'pair' },
-          { type: 'splatoon', stat: 'league', variant: 'team' },
-          { type: 'splatoon', stat: 'gear', variant: 'weapon' },
-          { type: 'splatoon', stat: 'gear', variant: 'head' },
-          { type: 'splatoon', stat: 'gear', variant: 'clothes' },
-          { type: 'splatoon', stat: 'gear', variant: 'shoes' },
-          { type: 'splatoon', stat: 'lifetimeWL' },
-        ])
-      }
-      if (SPLATOON_SALMON) {
-        this.order = this.order.concat([
-          { type: 'splatoon', stat: 'salmonRun', variant: 'overall' },
-          { type: 'splatoon', stat: 'salmonRun', variant: 'individual' },
-        ])
-      }
     }
 
     breakdown(line, THRESHOLD) {
@@ -149,9 +96,31 @@ export default class App extends React.Component {
     }
 
     async nextHeadline({ newsIndex, variantIndex }) {
+      const rawSettingsResponse = await fetch(`${'http://'}${process.env.REACT_APP_HOST}/settings.json`)
+      const settings = await rawSettingsResponse.json()
+      let flag = true
+      let updatedNewsIndex
+      for (let setting in settings) {
+        if (settings.hasOwnProperty(setting) && settings[setting] !== this.settings[setting]) {
+          flag = false
+          break
+        }
+      }
+      if (!flag) {
+        this.settings = settings
+        this.order = []
+        for (let setting in settings) {
+          if (settings.hasOwnProperty(setting) && settings[setting]) {
+            this.order = this.order.concat(CATEGORIES[setting])
+          }
+        }
+        newsIndex = 0
+        updatedNewsIndex = 1
+      } else {
+        updatedNewsIndex = (newsIndex + 1) % this.order.length
+      }
       const entry = this.order[newsIndex]
       const { stat, rotatingVariants, variant  } = entry
-      const updatedNewsIndex = (newsIndex + 1) % this.order.length
       const updatedVariantIndex = updatedNewsIndex === 0 ? (variantIndex + 1) % COUNT_VARIANT : variantIndex
       let line
       try {
