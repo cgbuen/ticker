@@ -12,6 +12,17 @@ with a lot of different versions.
 
     npm ci
 
+## Configure
+
+Duplicate .env.local.example and rename it to .env.example. Then:
+
+- Update the HOST variable to the location (if locally, IP/port of the machine)
+  for the API endpoint server.
+- Update the FONTS variable to the URL of the appropriate Typekit stylesheet.
+
 ## Run
+
+Ensure that API endpoint server is running. Then, in a new terminal tab, run
+this project here.
 
     npm start

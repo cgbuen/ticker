@@ -1,5 +1,5 @@
-import React from 'react';
-import './App.css';
+import React from 'react'
+import './App.css'
 
 const DURATION_ANIMATE = 250
 const DURATION_READ = 7000
@@ -155,7 +155,7 @@ export default class App extends React.Component {
       const updatedVariantIndex = updatedNewsIndex === 0 ? (variantIndex + 1) % COUNT_VARIANT : variantIndex
       let line
       try {
-        const rawApiResponse = await fetch(`${'http://localhost:3000/'}${this.order[newsIndex].type}.json`)
+        const rawApiResponse = await fetch(`${'http://'}${process.env.REACT_APP_HOST}/${this.order[newsIndex].type}.json`)
         const apiResponse = await rawApiResponse.json()
         if (Object.keys(apiResponse).length === 0 && apiResponse.constructor === Object) {
           console.log('** Empty object response presumably from error fetching API endpoint')
