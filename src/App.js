@@ -10,6 +10,7 @@ export default class App extends React.Component {
     constructor(props) {
       super(props)
       this.state = {
+        categorySubtitle: '',
         categoryDisplay: '',
         categoryAnimate: '',
         headlineDisplay: '',
@@ -27,7 +28,6 @@ export default class App extends React.Component {
       const matches = (line || '').match(imgRegExp)
       let tempLine = (line || '').replace(imgRegExp, '_$2_') || ''
       while (tempLine.length > 0) {
-        const title = (tempLine.match(/(\[.*?\] )(.*)/) || [])[1]
         if (tempLine.length < THRESHOLD) {
           if (matches) {
             tempLine = tempLine.split(/_(\d+)_/g)
@@ -55,9 +55,6 @@ export default class App extends React.Component {
           tempLine = ""
         } else {
           let index = tempLine.substr(0, THRESHOLD).lastIndexOf(' ')
-          if (index < title.length + 7) {
-            index = THRESHOLD
-          }
           let partialLine = tempLine.substr(0, index)
           if (matches) {
             partialLine = partialLine.split(/_(\d+)_/g)
@@ -85,7 +82,7 @@ export default class App extends React.Component {
             partialLine += ' ...'
           }
           lines.push(<span>{partialLine}</span>)
-          tempLine = `${title}...${tempLine.substr(index)}`
+          tempLine = `...${tempLine.substr(index)}`
         }
       }
       return lines
@@ -143,7 +140,7 @@ export default class App extends React.Component {
       } catch(e) {
         console.log('** Error fetching from API endpoint', e)
       }
-      const lines = this.breakdown(line, 115)
+      const lines = this.breakdown(line, 115) // 70 big goal, 115 without goal
       const loopLines = async (linesArray) => {
         if (linesArray.length) {
           const displayLine = linesArray.shift()
@@ -154,7 +151,8 @@ export default class App extends React.Component {
           await this.sleep(DURATION_ANIMATE)
           this.setState({
             headlineAnimate: '',
-            categoryDisplay: entry.type,
+            categorySubtitle: entry.subtitle,
+            categoryDisplay: entry.stat,
             headlineDisplay: displayLine,
           })
           if (displayLine) {
@@ -169,14 +167,15 @@ export default class App extends React.Component {
         }
       }
       this.setState({
-        categoryAnimate: this.state.categoryDisplay !== entry.type ? 'slide' : '',
+        categoryAnimate: this.state.categoryDisplay !== entry.stat ? 'slide' : '',
         headlineAnimate: 'fade'
       })
       await this.sleep(DURATION_ANIMATE)
       this.setState({
         categoryAnimate: '',
         headlineAnimate: '',
-        categoryDisplay: entry.type,
+        categorySubtitle: entry.subtitle,
+        categoryDisplay: entry.stat,
         headlineDisplay: lines.shift()
       })
       await loopLines(lines)
@@ -191,26 +190,31 @@ export default class App extends React.Component {
 
     translateCategory(rawCat) {
       const dict = {
-        'internal-stats': '@cgbuen',
-        'spotify': 'music',
-        'twitch': '@cgbuen',
+        'currentlyPlaying': 'Playing',
       }
       return dict[rawCat] || rawCat
     }
 
     getImage(rawCat) {
       const dict = {
-        'internal-stats': '/gear-up-bg.png',
+        'build': '/tapes-purple-2x.jpg',
+        'followers': '/octo-red-2x.png',
+        'subscribers': '/circles-green-2x.png',
+        'bits': '/camo-green-2x.png',
+        '!chrissucks': '/octoarrow-orange-2x.png',
+        'giveaway': '/camo-purple-2x.png',
+        'uptime': '/camo-red-2x.png',
+        'currentlyPlaying': '/stripes--green.png',
         'splatoon': '/triangles--pink.png',
         'acnh': '/pattern-leaves-turquoise-2x.jpg',
-        'twitch': '/gear-up-bg.png',
-        'spotify': '/stripes--green.png'
+        // unused: gear-up-bg.png, stars--blue.png
       }
       return dict[rawCat]
     }
 
     render() {
       const {
+        categorySubtitle,
         categoryDisplay,
         categoryAnimate,
         headlineDisplay,
@@ -220,7 +224,8 @@ export default class App extends React.Component {
       return (
         <div className="ticker">
           <div className={`category ${categoryAnimate}`} style={{ backgroundImage: `url('${this.getImage(categoryDisplay)}')` }}>
-            {this.translateCategory(categoryDisplay)}
+            <div className="subtitle">{categorySubtitle}</div>
+            <div className="title">{this.translateCategory(categoryDisplay)}</div>
           </div>
           <div className={`headline ${headlineAnimate}`}>
             {headlineDisplay}

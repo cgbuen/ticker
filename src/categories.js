@@ -1,18 +1,18 @@
 const BUILD = [
-  { type: 'internal-stats', stat: 'build' }
+  { type: 'internal-stats', stat: 'build', subtitle: 'current' }
 ]
 
 const DEFAULTS = [
-  { type: 'twitch', stat: 'followers' },
-  { type: 'twitch', stat: 'subs' },
-  { type: 'twitch', stat: 'bits', rotatingVariants: ['alltime', 'month', 'week'] },
-  { type: 'internal-stats', stat: 'chrissucks', rotatingVariants: ['alltime', 'month', 'week'] },
-  { type: 'internal-stats', stat: 'charity' },
-  { type: 'twitch', stat: 'uptime' },
+  { type: 'twitch', stat: 'followers', subtitle: 'latest', },
+  { type: 'twitch', stat: 'subscribers', subtitle: 'latest', },
+  { type: 'twitch', stat: 'bits', subtitle: 'leaders', rotatingVariants: ['alltime', 'month', 'week'] },
+  { type: 'internal-stats', stat: '!chrissucks', subtitle: 'leaders', rotatingVariants: ['alltime', 'month', 'week'] },
+  { type: 'internal-stats', stat: 'giveaway', subtitle: 'next', },
+  { type: 'twitch', stat: 'uptime', subtitle: 'current', },
 ]
 
 const SPOTIFY = [
-  { type: 'spotify', stat: 'currentlyPlaying' }
+  { type: 'spotify', stat: 'currentlyPlaying', subtitle: 'currently' }
 ]
 
 const ACNH = [

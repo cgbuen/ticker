@@ -19,19 +19,33 @@
 }
 .category {
   color: white;
-  font-size: 23px;
+  font-size: 24px;
   letter-spacing: 1px;
-  line-height: 72px;
+  line-height: 62px;
   margin: 0 25px;
+  min-width: 213px;
+  padding: 0 25px;
   text-align: center;
   text-shadow: 1px 2px 1px rgba(0, 0, 0, .75);
   text-transform: uppercase;
-  width: 150px;
+}
+.category .title {
+  margin-top: 10px;
+}
+.category .subtitle {
+  line-height: 1;
+  font-size: 14px;
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-shadow: 1px 1px 1px rgb(0 0 0 / 75%);
 }
 .headline {
 }
 .category, .headline {
   background-position: center;
+  background-size: cover;
   transition: all .25s ease;
   transform: translateY(0);
 }
